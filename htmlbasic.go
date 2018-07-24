@@ -17,6 +17,7 @@
 package gofpdf
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 )
@@ -162,6 +163,8 @@ func (html *HTMLBasicType) Write(lineHt float64, htmlStr string) {
 	list := HTMLBasicTokenize(htmlStr)
 	var ok bool
 	alignStr := "L"
+	var listPrefix string
+	tr := html.pdf.UnicodeTranslatorFromDescriptor("")
 	for _, el := range list {
 		switch el.Cat {
 		case 'T':
@@ -172,11 +175,23 @@ func (html *HTMLBasicType) Write(lineHt float64, htmlStr string) {
 				if alignStr == "C" || alignStr == "R" {
 					html.pdf.WriteAligned(0, lineHt, el.Str, alignStr)
 				} else {
-					html.pdf.Write(lineHt, el.Str)
+					if len(strings.TrimSpace(el.Str)) != 0 {
+						result := fmt.Sprintf("%s%s", listPrefix, el.Str)
+						fmt.Println("printing", result)
+						html.pdf.Write(lineHt, tr(result))
+					}
 				}
 			}
 		case 'O':
 			switch el.Str {
+			case "p":
+				html.pdf.Ln(lineHt)
+				html.pdf.SetFont("Arial", "B", 12)
+			case "ul":
+				html.pdf.Ln(lineHt)
+				listPrefix = "\u2022\t"
+			case "li":
+				fmt.Println("start list item")
 			case "b":
 				setStyle(1, 0, 0)
 			case "i":
@@ -202,6 +217,13 @@ func (html *HTMLBasicType) Write(lineHt float64, htmlStr string) {
 			}
 		case 'C':
 			switch el.Str {
+			case "p":
+				html.pdf.Ln(lineHt)
+				html.pdf.SetFont("Arial", "", 10)
+			case "ul":
+				listPrefix = ""
+			case "li":
+				html.pdf.Ln(lineHt)
 			case "b":
 				setStyle(-1, 0, 0)
 			case "i":
