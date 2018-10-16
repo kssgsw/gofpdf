@@ -186,7 +186,6 @@ func (html *HTMLBasicType) Write(lineHt float64, htmlStr string) {
 			switch el.Str {
 			case "p":
 				html.pdf.Ln(lineHt)
-				html.pdf.SetFont("Arial", "B", 12)
 			case "ul":
 				html.pdf.Ln(lineHt)
 				listPrefix = "\u2022\t"
@@ -219,7 +218,6 @@ func (html *HTMLBasicType) Write(lineHt float64, htmlStr string) {
 			switch el.Str {
 			case "p":
 				html.pdf.Ln(lineHt)
-				html.pdf.SetFont("Arial", "", 10)
 			case "ul":
 				listPrefix = ""
 			case "li":
